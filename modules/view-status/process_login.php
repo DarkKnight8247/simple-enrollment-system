@@ -5,13 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: login.php");
     exit;
 }
-require 'vendor/autoload.php';
-require 'cryptograph_process.php';
 
-$refNum = trim($_POST['refNum'] ?? '');
-$refNum = (int) $refNum;
+require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../../cryptograph_process.php';
 
-if ($refNum <= 0) {
+$refNum = strtoupper(trim($_POST['refNum'] ?? ''));
+
+if ($refNum === '') {
     header("Location: login.php?error=" . urlencode("Please enter a valid reference number."));
     exit;
 }
@@ -23,14 +23,15 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Verify enrollee exists and fetch their email
+// ─── Look up by reference_no (string), not enrollee_id ─────
 $stmt = $conn->prepare("
     SELECT e.enrollee_id, c.email
-    FROM enrollee e
-    INNER JOIN contacts c ON e.enrollee_id = c.enrollee_id
-    WHERE e.enrollee_id = ?
+    FROM education ed
+    INNER JOIN enrollee e  ON ed.enrollee_id = e.enrollee_id
+    INNER JOIN contacts c  ON e.enrollee_id  = c.enrollee_id
+    WHERE ed.reference_no = ?
 ");
-$stmt->bind_param("i", $refNum);
+$stmt->bind_param("s", $refNum);
 $stmt->execute();
 $stmt->bind_result($enrollee_id, $enc_email);
 $found = $stmt->fetch();
@@ -48,26 +49,24 @@ $email = decryptData($enc_email);
 // Generate a 6-digit OTP
 $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-// Store in session (expires in 10 minutes)
-$_SESSION['otp_code']       = $otp;
-$_SESSION['otp_expires']    = time() + 600;
-$_SESSION['otp_enrollee_id']= $enrollee_id;
-$_SESSION['otp_email']      = $email;
+// Store in session
+$_SESSION['otp_code']        = $otp;
+$_SESSION['otp_expires']     = time() + 600;
+$_SESSION['otp_enrollee_id'] = $enrollee_id;
+$_SESSION['otp_email']       = $email;
+$_SESSION['otp_ref']         = $refNum;
 
 // Send OTP via PHPMailer
-require '../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 $mail = new PHPMailer(true);
 try {
-    // ── Configure SMTP here ──────────────────────────────────
-    // For production, replace with your actual SMTP credentials.
     $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';       // e.g. smtp.gmail.com
+    $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'sunnnotifier@gmail.com'; // ← change this
-    $mail->Password   = 'lvvg pymy ubfu xqvt';    // ← change this (App Password)
+    $mail->Username   = 'sunnnotifier@gmail.com';
+    $mail->Password   = 'lvvg pymy ubfu xqvt';
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
@@ -103,8 +102,6 @@ try {
     exit;
 
 } catch (Exception $e) {
-    // If SMTP fails in development, just forward with OTP in session anyway
-    // (Remove this fallback in production!)
     header("Location: otp.php?dev=1");
     exit;
 }

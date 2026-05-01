@@ -1,6 +1,10 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__ . '/../../cryptograph_process.php';
+    require __DIR__ . '/../../vendor/autoload.php';
 
     // ─── 1. Sanitize ───────────────────────────────────────────
     $first_name       = htmlspecialchars(trim($_POST['first_name']       ?? ''));
@@ -22,32 +26,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // ─── 2. Required field validation ──────────────────────────
     $errors = [];
 
-    if ($first_name   === '') $errors[] = "First name is required.";
-    if ($last_name    === '') $errors[] = "Last name is required.";
-    if ($sex          === '') $errors[] = "Sex is required.";
-    if ($birthdate    === '') $errors[] = "Date of birth is required.";
-    if ($civil_status === '') $errors[] = "Civil status is required.";
-    if ($email        === '') $errors[] = "Email is required.";
-    if ($phone        === '') $errors[] = "Phone number is required.";
-    if ($address      === '') $errors[] = "Address is required.";
+    if ($first_name       === '') $errors[] = "First name is required.";
+    if ($last_name        === '') $errors[] = "Last name is required.";
+    if ($sex              === '') $errors[] = "Sex is required.";
+    if ($birthdate        === '') $errors[] = "Date of birth is required.";
+    if ($civil_status     === '') $errors[] = "Civil status is required.";
+    if ($email            === '') $errors[] = "Email is required.";
+    if ($phone            === '') $errors[] = "Phone number is required.";
+    if ($address          === '') $errors[] = "Address is required.";
     if ($guardian_name    === '') $errors[] = "Guardian name is required.";
     if ($guardian_phone   === '') $errors[] = "Guardian phone is required.";
     if ($guardian_address === '') $errors[] = "Guardian address is required.";
-    if ($year_level   === '') $errors[] = "Year level is required.";
+    if ($year_level       === '') $errors[] = "Year level is required.";
 
-    // course_id — must be a valid positive integer
     if (empty($_POST['course_id']) || (int)$_POST['course_id'] <= 0) {
         $errors[] = "Please select a course.";
     } else {
         $course_id = (int) $_POST['course_id'];
     }
 
-    // Phone format
     if ($phone !== '' && !preg_match('/^09\d{9}$/', $phone)) {
         $errors[] = "Invalid phone number. Use format: 09XXXXXXXXX";
     }
 
-    // Guardian phone format
     if ($guardian_phone !== '' && !preg_match('/^09\d{9}$/', $guardian_phone)) {
         $errors[] = "Invalid guardian phone number. Use format: 09XXXXXXXXX";
     }
@@ -82,10 +83,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Throw exceptions on mysqli errors so try/catch works correctly
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // ─── 5. Verify course_id actually exists in course table ───
+    // ─── 5. Verify course_id exists ────────────────────────────
     $stmt = $conn->prepare("SELECT COUNT(*) FROM course WHERE course_id = ?");
     $stmt->bind_param("i", $course_id);
     $stmt->execute();
@@ -99,7 +99,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // ─── 6. Duplicate checks ───────────────────────────────────
-    // Full name (only among already-enrolled students)
     $stmt = $conn->prepare("
         SELECT COUNT(*) FROM enrollee e
         INNER JOIN education ed ON e.enrollee_id = ed.enrollee_id
@@ -111,7 +110,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->fetch();
     $stmt->close();
 
-    // Email
     $stmt = $conn->prepare("SELECT COUNT(*) FROM contacts WHERE email = ?");
     $stmt->bind_param("s", $enc_email);
     $stmt->execute();
@@ -119,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->fetch();
     $stmt->close();
 
-    // Phone
     $stmt = $conn->prepare("SELECT COUNT(*) FROM contacts WHERE phone_number = ?");
     $stmt->bind_param("s", $enc_phone);
     $stmt->execute();
@@ -141,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // ─── 8. Insert (all-or-nothing transaction) ─────────────────
+    // ─── 8. Insert (all-or-nothing transaction) ────────────────
     try {
         $conn->begin_transaction();
 
@@ -178,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         $stmt->close();
 
-       // ─── Generate reference number ─────────────────────────
+        // Generate reference number
         $reference_no = strtoupper(substr(md5(uniqid()), 0, 8));
 
         // education
@@ -194,10 +191,90 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         $conn->commit();
-        echo "Enrollment successful!";
-        echo "<p>Your reference number is: <strong>$reference_no</strong></p>";
-        echo "<p>Please save this to track your application status.</p>";
-        echo "<br><a href='../../index.php'>Go back to Home</a>";
+
+        // ─── 9. Send confirmation email ────────────────────────
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'sunnnotifier@gmail.com';
+            $mail->Password   = 'lvvg pymy ubfu xqvt';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
+
+            $mail->setFrom('sunnnotifier@gmail.com', 'SUNN Enrollment System');
+            $mail->addAddress($email);
+            $mail->isHTML(true);
+            $mail->Subject = 'SUNN Enrollment – Application Received';
+            $mail->Body    = "
+                <div style='font-family:sans-serif; max-width:520px; margin:0 auto;'>
+                    <div style='background:#0b1f3a; padding:28px 32px; text-align:center;'>
+                        <h2 style='color:#c9923e; margin:0; font-size:22px; letter-spacing:0.04em;'>
+                            SUNN Enrollment System
+                        </h2>
+                        <p style='color:#6b7d96; font-size:12px; margin:8px 0 0;'>
+                            State University of Northern Negros
+                        </p>
+                    </div>
+                    <div style='padding:36px 32px; background:#faf8f4;'>
+                        <p style='color:#142d52; font-size:16px; font-weight:600; margin-top:0;'>
+                            Hello, {$first_name}!
+                        </p>
+                        <p style='color:#4b5563; font-size:14px; line-height:1.7;'>
+                            You have successfully filled out the SUNN enrollment form.
+                            Please keep your reference number safe — you will need it to
+                            track and manage your application.
+                        </p>
+                        <div style='background:#fff; border:2px solid #c9923e; border-radius:10px;
+                                    text-align:center; padding:24px; margin:24px 0;'>
+                            <p style='color:#6b7d96; font-size:12px; text-transform:uppercase;
+                                       letter-spacing:0.1em; margin:0 0 8px;'>Your Reference Number</p>
+                            <span style='font-size:28px; font-weight:700; color:#0b1f3a;
+                                         letter-spacing:0.25em; font-family:monospace;'>
+                                {$reference_no}
+                            </span>
+                        </div>
+                        <p style='color:#4b5563; font-size:14px; line-height:1.7;'>
+                            Please wait for further instructions from our admissions team.
+                            We will notify you once your application has been reviewed.
+                        </p>
+                        <div style='background:#fffbeb; border-left:4px solid #c9923e;
+                                    border-radius:6px; padding:16px 20px; margin:24px 0;'>
+                            <p style='color:#92400e; font-size:13px; margin:0; line-height:1.6;'>
+                                💡 <strong>In the meantime</strong>, you may edit your application
+                                details while your status is still <strong>Pending</strong> by visiting
+                                the <strong>View Status</strong> page and entering your reference number.
+                            </p>
+                        </div>
+                        <p style='color:#9ca3af; font-size:12px; line-height:1.6; margin-bottom:0;'>
+                            If you did not submit this application, please disregard this email
+                            or contact us immediately.
+                        </p>
+                    </div>
+                    <div style='background:#0b1f3a; padding:18px 32px; text-align:center;'>
+                        <p style='color:#4b5a6e; font-size:12px; margin:0;'>
+                            &copy; " . date('Y') . " SUNN Enrollment System &nbsp;·&nbsp; This is an automated message.
+                        </p>
+                    </div>
+                </div>
+            ";
+
+            $mail->send();
+
+        } catch (Exception $e) {
+            // Email failure does NOT roll back the enrollment
+            error_log("Enrollment email failed for {$email}: " . $e->getMessage());
+        }
+
+        // ─── 10. Success message ───────────────────────────────
+        echo "
+            <p>Enrollment submitted successfully!</p>
+            <p>Your reference number is: <strong>{$reference_no}</strong></p>
+            <p>A confirmation email has been sent to your registered email address.</p>
+            <br>
+            <a href='../../index.php'>Go back to Home</a>
+        ";
 
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();

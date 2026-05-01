@@ -15,7 +15,6 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 1. ENROLLEE
-    // TEXT columns to accommodate encrypted values
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS enrollee (
@@ -31,8 +30,6 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 2. CONTACTS
-    // VARCHAR(500) for encrypted email (UNIQUE index
-    // requires a fixed-length column, not TEXT)
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS contacts (
@@ -63,8 +60,6 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 4. COURSE
-    // Not encrypted — stores plain course names
-    // used as FK reference from education
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS course (
@@ -75,10 +70,9 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 5. EDUCATION
-    // course_id allows NULL (ON DELETE SET NULL)
     // =============================================
     $conn->query("
-        CREATE TABLE IF NOT EXISTS education (
+    CREATE TABLE IF NOT EXISTS education (
         education_id    INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id     INT,
         course_id       INT NULL,
@@ -97,8 +91,6 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 6. ADMINS
-    // Standalone — no FK to enrollee tables
-    // Passwords stored as bcrypt hashes
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS admins (
@@ -108,10 +100,9 @@ if ($conn->query($sql) === TRUE) {
         created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
     ");
-     // =============================================
+
+    // =============================================
     // 7. ALTER ENROLLEE
-    // Add notified + status columns if not exist
-    // ALTER IF NOT EXISTS is safe to run repeatedly
     // =============================================
     $conn->query("
         ALTER TABLE enrollee
@@ -125,8 +116,6 @@ if ($conn->query($sql) === TRUE) {
 
     // =============================================
     // 8. SEED COURSES
-    // INSERT IGNORE skips duplicates safely on
-    // repeated runs — won't error if already seeded
     // =============================================
     $conn->query("
     INSERT IGNORE INTO course (course_id, course_name) VALUES
@@ -146,17 +135,8 @@ if ($conn->query($sql) === TRUE) {
     (14, 'Bachelor of Secondary Education')
     ");
 
-    echo "Database, tables, and seed courses created successfully.";
-
-} else {
-    die("ERROR creating database: " . $conn->error);
-}
-
-$conn->close();
-
     // =============================================
     // 9. SEED ADMIN ACCOUNT
-    // Password hashed with bcrypt via password_hash
     // =============================================
     require __DIR__ . '/cryptograph_process.php';
 
@@ -168,5 +148,12 @@ $conn->close();
         VALUES ('$admin_username', '$admin_password')
     ");
 
-    echo "Admin account created successfully.";
+    echo "Database, tables, seed courses, and admin account created successfully.";
+
+} else {
+    die("ERROR creating database: " . $conn->error);
+}
+
+// ← close ONCE, at the very end
+$conn->close();
 ?>
