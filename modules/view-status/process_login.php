@@ -66,13 +66,13 @@ try {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';       // e.g. smtp.gmail.com
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'your_email@gmail.com'; // ← change this
-    $mail->Password   = 'your_app_password';    // ← change this (App Password)
+    $mail->Username   = 'sunnnotifier@gmail.com'; // ← change this
+    $mail->Password   = 'lvvg pymy ubfu xqvt';    // ← change this (App Password)
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
     // ────────────────────────────────────────────────────────
 
-    $mail->setFrom('noreply@sunn.edu.ph', 'SUNN Enrollment System');
+    $mail->setFrom('sunnnotifier@gmail.com', 'SUNN Enrollment System');
     $mail->addAddress($email);
     $mail->isHTML(true);
     $mail->Subject = 'Your SUNN Enrollment OTP';

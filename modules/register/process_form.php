@@ -191,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         $conn->commit();
-        echo "Enrollment successful! <br><a href='index.php'>Go back to Home</a>";
+        echo "Enrollment successful! <br><a href='.././index.php'>Go back to Home</a>";
 
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
