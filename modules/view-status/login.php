@@ -7,7 +7,7 @@
 </head>
 <body>
     <form action="process_login.php" method="POST">
-        <label for="">Refference Number:</label><br>
+        <label for="">Reference Number:</label><br>
         <input type="text" name="refNum" required><br><br>
 
         <button type="submit">Login</button>

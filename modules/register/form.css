@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    --sunn-gold: #fbbf24;
+    --sunn-green: #3f9142;
+    --sunn-blue: #5b8db8;
+    --glass-bg: #ffffff; /* Solid white as seen in the reference */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    padding: 60px 20px;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Background: A perfect blend of your three core colors */
+    background: linear-gradient(135deg, var(--sunn-blue) 0%, #4a80a4 25%, var(--sunn-green) 100%);
+    background-attachment: fixed;
+}
+
+form {
+    background: var(--glass-bg);
+    border-radius: 30px;
+    padding: 60px;
+    max-width: 700px;
+    width: 100%;
+    
+    /* Clean shadow for depth */
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    
+    /* The Signature Gold Frame */
+    border: 8px solid var(--sunn-gold);
+}
+
+h2 {
+    color: var(--sunn-green);
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+    padding-left: 15px;
+    border-left: 6px solid var(--sunn-gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+h2:first-of-type { margin-top: 0; }
+
+/* Grouping fields for vertical flow */
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    margin-top: 25px;
+}
+
+label span {
+    color: #ef4444;
+    margin-left: 3px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2.5px solid #e2e8f0; /* Slightly thicker borders for clarity */
+    border-radius: 15px;
+    font-size: 1rem;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    color: #334155;
+}
+
+input::placeholder {
+    color: #94a3b8;
+}
+
+/* Custom dropdown logic */
+select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233f9142'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 18px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--sunn-blue);
+    box-shadow: 0 0 0 4px rgba(91, 141, 184, 0.1);
+}
+
+button {
+    width: 100%;
+    margin-top: 40px;
+    background: var(--sunn-gold);
+    color: #000;
+    padding: 20px;
+    border: none;
+    border-radius: 18px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 0px #d97706;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: #fcd34d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0px #d97706;
+}
+
+button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    form { padding: 40px 20px; }
+    h2 { font-size: 1.4rem; }
+}
