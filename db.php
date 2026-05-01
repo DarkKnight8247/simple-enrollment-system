@@ -82,6 +82,7 @@ if ($conn->query($sql) === TRUE) {
         education_id    INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id     INT,
         course_id       INT NULL,
+        reference_no    VARCHAR(30) NOT NULL UNIQUE,
         year_level      TEXT,
         previous_school TEXT,
         gpa             TEXT,
