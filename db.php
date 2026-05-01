@@ -13,54 +13,59 @@ if ($conn->query($sql) === TRUE) {
 
     $conn->select_db("sunn_enrollment");
 
-    // =========================
-    // ENROLLEE TABLE
-    // =========================
+    // =============================================
+    // 1. ENROLLEE
+    // TEXT columns to accommodate encrypted values
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS enrollee (
         enrollee_id  INT AUTO_INCREMENT PRIMARY KEY,
-        first_name   VARCHAR(100) NOT NULL,
-        last_name    VARCHAR(100) NOT NULL,
-        middle_name  VARCHAR(100),
-        sex          ENUM('Male', 'Female') NOT NULL,
-        birthdate    DATE NOT NULL,
-        civil_status VARCHAR(20)
+        first_name   TEXT NOT NULL,
+        last_name    TEXT NOT NULL,
+        middle_name  TEXT,
+        sex          TEXT NOT NULL,
+        birthdate    TEXT NOT NULL,
+        civil_status TEXT
     ) ENGINE=InnoDB;
     ");
 
-    // =========================
-    // CONTACTS TABLE
-    // =========================
+    // =============================================
+    // 2. CONTACTS
+    // VARCHAR(500) for encrypted email (UNIQUE index
+    // requires a fixed-length column, not TEXT)
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS contacts (
         contact_id   INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id  INT,
-        email        VARCHAR(150) UNIQUE NOT NULL,
-        phone_number VARCHAR(20) NOT NULL,
+        email        VARCHAR(500) NOT NULL UNIQUE,
+        phone_number TEXT NOT NULL,
         address      TEXT NOT NULL,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
             ON DELETE CASCADE
     ) ENGINE=InnoDB;
     ");
 
-    // =========================
-    // EMERGENCY CONTACTS TABLE
-    // =========================
+    // =============================================
+    // 3. EMERGENCY CONTACTS
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS emergency_contacts (
         emergency_id  INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id   INT,
-        guardian_name VARCHAR(150) NOT NULL,
-        phone_number  VARCHAR(20) NOT NULL,
+        guardian_name TEXT NOT NULL,
+        phone_number  TEXT NOT NULL,
         address       TEXT NOT NULL,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
             ON DELETE CASCADE
     ) ENGINE=InnoDB;
     ");
 
-    // =========================
-    // COURSE TABLE
-    // =========================
+    // =============================================
+    // 4. COURSE
+    // Not encrypted — stores plain course names
+    // used as FK reference from education
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS course (
         course_id   INT AUTO_INCREMENT PRIMARY KEY,
@@ -68,17 +73,18 @@ if ($conn->query($sql) === TRUE) {
     ) ENGINE=InnoDB;
     ");
 
-    // =========================
-    // EDUCATION TABLE
-    // =========================
+    // =============================================
+    // 5. EDUCATION
+    // course_id allows NULL (ON DELETE SET NULL)
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS education (
         education_id    INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id     INT,
-        course_id       INT,
-        year_level      VARCHAR(20),
-        previous_school VARCHAR(200),
-        gpa             VARCHAR(10),
+        course_id       INT NULL,
+        year_level      TEXT,
+        previous_school TEXT,
+        gpa             TEXT,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
             ON DELETE CASCADE,
         FOREIGN KEY (course_id) REFERENCES course(course_id)
@@ -86,9 +92,11 @@ if ($conn->query($sql) === TRUE) {
     ) ENGINE=InnoDB;
     ");
 
-    // =========================
-    // ADMINS TABLE
-    // =========================
+    // =============================================
+    // 6. ADMINS
+    // Standalone — no FK to enrollee tables
+    // Passwords stored as bcrypt hashes
+    // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS admins (
         id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -98,7 +106,30 @@ if ($conn->query($sql) === TRUE) {
     ) ENGINE=InnoDB;
     ");
 
-    echo "Database and tables created successfully.";
+    // =============================================
+    // 7. SEED COURSES
+    // INSERT IGNORE skips duplicates safely on
+    // repeated runs — won't error if already seeded
+    // =============================================
+    $conn->query("
+    INSERT IGNORE INTO course (course_id, course_name) VALUES
+    (1,  'Bachelor of Science in Computer Science'),
+    (2,  'Bachelor of Science in Information Technology'),
+    (3,  'Bachelor of Science in Information Systems'),
+    (4,  'Bachelor of Science in Civil Engineering'),
+    (5,  'Bachelor of Science in Electrical Engineering'),
+    (6,  'Bachelor of Science in Mechanical Engineering'),
+    (7,  'Bachelor of Science in Nursing'),
+    (8,  'Bachelor of Science in Pharmacy'),
+    (9,  'Bachelor of Science in Physical Therapy'),
+    (10, 'Bachelor of Science in Accountancy'),
+    (11, 'Bachelor of Science in Business Administration'),
+    (12, 'Bachelor of Science in Tourism Management'),
+    (13, 'Bachelor of Elementary Education'),
+    (14, 'Bachelor of Secondary Education')
+    ");
+
+    echo "Database, tables, and seed courses created successfully.";
 
 } else {
     die("ERROR creating database: " . $conn->error);
