@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    require 'cryptograph_process.php';
+    require __DIR__ . '/../../cryptograph_process.php';
 
     // sanitize natin yan
     $first_name      = htmlspecialchars(trim($_POST['first_name']      ?? ''));
