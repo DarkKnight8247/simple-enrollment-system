@@ -6,6 +6,6 @@
     <title>SUNN Enrollment System</title>
 </head>
 <body>
-    <a href="modules/register/form.php">Enroll Now!</a><br><a href="modules/view-status/view.php">View Status</a><br><a href="modules/admin/admin_login.php"">Admin Dashboard </a>
+    <a href="modules/register/index.php">Enroll Now!</a><br><a href="modules/view-status/index.php">View Status</a><br><a href="modules/admin/index.php"">Admin Dashboard </a>
 </body> 
 </html>

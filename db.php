@@ -108,9 +108,23 @@ if ($conn->query($sql) === TRUE) {
         created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
     ");
+     // =============================================
+    // 7. ALTER ENROLLEE
+    // Add notified + status columns if not exist
+    // ALTER IF NOT EXISTS is safe to run repeatedly
+    // =============================================
+    $conn->query("
+        ALTER TABLE enrollee
+        ADD COLUMN IF NOT EXISTS notified TINYINT(1) NOT NULL DEFAULT 0
+    ");
+
+    $conn->query("
+        ALTER TABLE enrollee
+        ADD COLUMN IF NOT EXISTS status ENUM('Pending','Accepted','Rejected') NOT NULL DEFAULT 'Pending'
+    ");
 
     // =============================================
-    // 7. SEED COURSES
+    // 8. SEED COURSES
     // INSERT IGNORE skips duplicates safely on
     // repeated runs — won't error if already seeded
     // =============================================
@@ -139,4 +153,20 @@ if ($conn->query($sql) === TRUE) {
 }
 
 $conn->close();
+
+    // =============================================
+    // 9. SEED ADMIN ACCOUNT
+    // Password hashed with bcrypt via password_hash
+    // =============================================
+    require __DIR__ . '/cryptograph_process.php';
+
+    $admin_username = encryptData('admin');
+    $admin_password = password_hash('admin123', PASSWORD_BCRYPT);
+
+    $conn->query("
+        INSERT IGNORE INTO admins (username, password_hash)
+        VALUES ('$admin_username', '$admin_password')
+    ");
+
+    echo "Admin account created successfully.";
 ?>

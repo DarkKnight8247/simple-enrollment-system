@@ -28,7 +28,7 @@
         <p><strong>Incorrect username or password.</strong> Please check your credentials and try again. This portal is for authorized SUNN personnel only.</p>
         
         <!-- 3. Updated Button: Back to Login[cite: 6] -->
-        <a class="btn-try" href="admin_login.php">Back to Login</a>
+        <a class="btn-try" href="index.php">Back to Login</a>
     <?php endif; ?>
 
     <div class="footer-note">SUNN Enrollment System &nbsp;·&nbsp; Admin Portal</div>

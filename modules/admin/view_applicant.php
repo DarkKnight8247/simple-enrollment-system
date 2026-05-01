@@ -35,7 +35,6 @@ $initials        = strtoupper(substr($fname, 0, 1) . substr($lname, 0, 1));
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* ── NAV ── */
         nav {
            background: #ffffff;
             border-bottom: 3px solid #E8A020;
@@ -310,7 +309,7 @@ $initials        = strtoupper(substr($fname, 0, 1) . substr($lname, 0, 1));
             <div class="profile-hero-badge">🎓 Applicant Profile</div>
             <div class="profile-hero-name"><?= htmlspecialchars($fname . ' ' . $lname) ?></div>
             <div class="profile-hero-meta">
-                <div class="profile-meta-chip">🪪 ID #<?= $data['enrollee_id'] ?></div>
+                <div class="profile-meta-chip">🪪 <?= htmlspecialchars($data['reference_no']) ?></div>
                 <div class="profile-meta-chip status-<?= $current_status ?>">
                     <?= $current_status === 'accepted' ? '✅' : ($current_status === 'rejected' ? '❌' : '⏳') ?>
                     <?= ucfirst($current_status) ?>
@@ -342,9 +341,9 @@ $initials        = strtoupper(substr($fname, 0, 1) . substr($lname, 0, 1));
         </div>
 
         <div class="data-row">
-            <div class="data-label"><span class="data-label-icon">🆔</span> Enrollee ID</div>
-            <div class="data-value">#<?= $data['enrollee_id'] ?></div>
-        </div>
+            <div class="data-label"><span class="data-label-icon">🪪</span> Reference No.</div>
+            <div class="data-value"><strong><?= htmlspecialchars($data['reference_no']) ?></strong></div>
+        </div>`
 
         <div class="data-row">
             <div class="data-label"><span class="data-label-icon">🎓</span> Course Choice</div>

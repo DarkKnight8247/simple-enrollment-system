@@ -70,7 +70,6 @@ try {
     $mail->Password   = 'lvvg pymy ubfu xqvt';    // ← change this (App Password)
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
-    // ────────────────────────────────────────────────────────
 
     $mail->setFrom('sunnnotifier@gmail.com', 'SUNN Enrollment System');
     $mail->addAddress($email);

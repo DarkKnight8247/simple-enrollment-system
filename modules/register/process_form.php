@@ -178,20 +178,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         $stmt->close();
 
-        // education — course_id is a verified INT at this point, safe to use "ii"
+       // ─── Generate reference number ─────────────────────────
+        $reference_no = strtoupper(substr(md5(uniqid()), 0, 8));
+
+        // education
         $stmt = $conn->prepare("
-            INSERT INTO education (enrollee_id, course_id, year_level, previous_school, gpa)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO education (enrollee_id, course_id, reference_no, year_level, previous_school, gpa)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("iisss",
+        $stmt->bind_param("iissss",
             $enrollee_id, $course_id,
-            $enc_year_level, $enc_previous_school, $enc_gpa
+            $reference_no, $enc_year_level, $enc_previous_school, $enc_gpa
         );
         $stmt->execute();
         $stmt->close();
 
         $conn->commit();
-        echo "Enrollment successful! <br><a href='.././index.php'>Go back to Home</a>";
+        echo "Enrollment successful!";
+        echo "<p>Your reference number is: <strong>$reference_no</strong></p>";
+        echo "<p>Please save this to track your application status.</p>";
+        echo "<br><a href='../../index.php'>Go back to Home</a>";
 
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
