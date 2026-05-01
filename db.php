@@ -78,7 +78,7 @@ if ($conn->query($sql) === TRUE) {
     // course_id allows NULL (ON DELETE SET NULL)
     // =============================================
     $conn->query("
-    CREATE TABLE IF NOT EXISTS education (
+        CREATE TABLE IF NOT EXISTS education (
         education_id    INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id     INT,
         course_id       INT NULL,
@@ -86,6 +86,8 @@ if ($conn->query($sql) === TRUE) {
         year_level      TEXT,
         previous_school TEXT,
         gpa             TEXT,
+        status          ENUM('Pending', 'Accepted', 'Rejected') DEFAULT 'Pending',
+        submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
             ON DELETE CASCADE,
         FOREIGN KEY (course_id) REFERENCES course(course_id)
