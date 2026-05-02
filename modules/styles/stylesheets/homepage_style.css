@@ -201,102 +201,96 @@ footer {
     .info-card { max-width: 500px; margin: 0 auto; }
 }
 
-/* --- Consent Page Specific Styles --- */
+/* --- Consent Height Fixes --- */
 
-.relative-z {
+/* Use min-height instead of height: 100vh to allow the page to grow if needed */
+.consent-hero {
+    position: relative;
+    min-height: 100vh;
+    background: url('../graphics/bg.jpg') no-repeat center center/cover;
+    padding: 100px 20px 60px; /* Space for fixed header and footer */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Start from top so header is visible */
+}
+
+.consent-wrapper-inner {
     position: relative;
     z-index: 5;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    width: 100%;
+    max-width: 700px;
 }
 
 .consent-card {
     background: #ffffff;
-    max-width: 850px;
-    margin: 0 auto;
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    /* Limit height so it fits on laptop screens */
+    max-height: 80vh; 
 }
 
 .card-header {
     background: #1b4d3e;
     color: #fff;
-    padding: 30px;
+    padding: 20px;
     text-align: center;
+    flex-shrink: 0; /* Prevents header from squishing */
 }
 
 .card-header h2 {
-    font-size: 1.8rem;
-    margin: 5px 0;
+    font-size: 1.4rem;
+    margin-top: 5px;
 }
 
 .consent-body {
-    padding: 40px;
-    max-height: 400px; /* Scrollable for long text */
-    overflow-y: auto;
-    border-bottom: 1px solid #eee;
+    padding: 25px 30px;
+    overflow-y: auto; /* This makes the legal text scrollable inside the card */
+    background: #fff;
+    flex-grow: 1;
 }
 
-.privacy-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    margin: 25px 0;
+.privacy-section {
+    margin-bottom: 20px;
 }
 
-.privacy-item h3 {
-    font-size: 1rem;
+.privacy-section h3 {
+    font-size: 1.1rem;
     color: #1b4d3e;
-    border-bottom: 2px solid #f1c40f;
-    margin-bottom: 10px;
+    border-left: 4px solid #f1c40f;
+    padding-left: 10px;
+    margin-bottom: 8px;
 }
 
-.rights-section {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-.contact-box {
-    margin-top: 20px;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-/* Form Section */
+/* Footer fixed at the bottom of the card */
 .consent-footer {
-    padding: 30px 40px;
-    background: #f1f1f1;
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    flex-shrink: 0; 
 }
 
 .checkbox-container {
     display: block;
-    position: relative;
-    padding-left: 35px;
-    margin-bottom: 25px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
     cursor: pointer;
-    font-size: 0.95rem;
-    color: #444;
 }
 
 .form-actions {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
 }
 
-.btn-link {
-    color: #666;
-    text-decoration: none;
+.form-actions .btn {
+    padding: 10px 25px;
     font-size: 0.9rem;
 }
 
-.btn-link:hover {
-    color: #e74c3c;
-}
-
-/* Scrollbar Styling for the card */
+/* Scrollbar styling for the internal content */
 .consent-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -305,7 +299,9 @@ footer {
     border-radius: 10px;
 }
 
-@media (max-width: 768px) {
-    .privacy-grid { grid-template-columns: 1fr; }
-    .form-actions { flex-direction: column; }
+/* Adjust for small mobile screens */
+@media (max-height: 700px) {
+    .consent-card { max-height: 85vh; }
+    .card-header { padding: 15px; }
+    .consent-body { padding: 15px 20px; }
 }
