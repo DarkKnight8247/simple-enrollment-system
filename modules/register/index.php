@@ -3,139 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUNN Enrollment System</title>
-    <link rel="stylesheet" href="form.css">
+    <title>Data Privacy Consent – SUNN Enrollment</title>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header Section -->
-    <div class="header">
-        <img src="logo.png" alt="SUNN Logo" class="logo">
-        <h1>STATE UNIVERSITY OF NORTHERN NEGROS</h1>
-        <p class="tagline">The Future Shines Brightest</p>
-        <div class="divider"></div>
-        <h2>STUDENT REGISTRATION FORM</h2>
-    </div>
+    <h1>Data Privacy Consent Form</h1>
+    <h2>State University of Northern Negros (SUNN) Enrollment System</h2>
 
-    <!-- Form Section -->
-    <div class="content">
-        <form method="POST" action="process_form.php">
+    <p>
+        In compliance with the <strong>Republic Act No. 10173</strong>, otherwise known as the
+        <strong>Data Privacy Act of 2012</strong> of the Philippines, the State University of
+        Northern Negros (SUNN) is committed to protecting and respecting your personal data.
+    </p>
 
-            <h3>Personal Information</h3>
+    <p>
+        Before proceeding with your enrollment application, please read the following carefully.
+    </p>
 
-            <label>First Name <span>*</span></label>
-            <input type="text" name="first_name" placeholder="e.g. Maria" required>
+    <hr>
 
-            <label>Middle Name</label>
-            <input type="text" name="middle_name" placeholder="Optional">
+    <h3>1. Purpose of Data Collection</h3>
+    <p>
+        SUNN collects your personal information solely for the purpose of processing your
+        enrollment application. The data collected includes, but is not limited to:
+    </p>
+    <ul>
+        <li>Full name, date of birth, sex, and civil status</li>
+        <li>Contact information (email address, phone number, home address)</li>
+        <li>Emergency contact details (guardian name, phone number, address)</li>
+        <li>Academic background (course preference, year level, previous school, GPA)</li>
+    </ul>
 
-            <label>Last Name <span>*</span></label>
-            <input type="text" name="last_name" placeholder="e.g. Santos" required>
+    <h3>2. How Your Data Will Be Used</h3>
+    <p>Your personal information will be used for the following purposes:</p>
+    <ul>
+        <li>Processing and evaluating your enrollment application</li>
+        <li>Sending notifications regarding your application status</li>
+        <li>Communicating updates and instructions from the admissions office</li>
+        <li>Maintaining official university enrollment records</li>
+    </ul>
 
-            <label>Date of Birth <span>*</span></label>
-            <input type="date" name="birthdate" required>
+    <h3>3. Data Security</h3>
+    <p>
+        SUNN employs industry-standard security measures to protect your personal data.
+        All sensitive information submitted through this system is <strong>encrypted</strong>
+        before being stored in our database. Access to your data is strictly limited to
+        authorized university personnel only.
+    </p>
 
-            <label>Sex <span>*</span></label>
-            <select name="sex" required>
-                <option value="" disabled selected hidden>— Select Sex —</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
+    <h3>4. Data Retention</h3>
+    <p>
+        Your personal data will be retained for the duration of your enrollment process
+        and as required by applicable laws and university policies. Data that is no longer
+        needed will be securely disposed of.
+    </p>
 
-            <label>Civil Status <span>*</span></label>
-            <select name="civil_status" required>
-                <option value="" disabled selected hidden>— Select Civil Status —</option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-                <option value="Separated">Separated</option>
-            </select>
+    <h3>5. Your Rights</h3>
+    <p>Under the Data Privacy Act of 2012, you have the right to:</p>
+    <ul>
+        <li><strong>Be informed</strong> — know how your data is being collected and used</li>
+        <li><strong>Access</strong> — request access to your personal data held by SUNN</li>
+        <li><strong>Correct</strong> — update or correct inaccurate information</li>
+        <li><strong>Object</strong> — object to the processing of your personal data</li>
+        <li><strong>Erasure</strong> — request deletion of your data under certain conditions</li>
+    </ul>
 
-            <div class="section-divider"></div>
+    <h3>6. Third-Party Disclosure</h3>
+    <p>
+        SUNN will <strong>not</strong> sell, trade, or transfer your personal data to
+        outside parties without your consent, except as required by law or by authorized
+        government agencies.
+    </p>
 
-            <h3>Contact Information</h3>
+    <h3>7. Contact Information</h3>
+    <p>
+        For concerns regarding your personal data, you may contact the SUNN Data Protection
+        Officer at:
+    </p>
+    <ul>
+        <li>Email: <a href="mailto:dpo@sunn.edu.ph">dpo@sunn.edu.ph</a></li>
+        <li>Address: SUNN Main Campus, Sagay City, Negros Occidental</li>
+    </ul>
 
-            <label>Email Address <span>*</span></label>
-            <input type="email" name="email" placeholder="your@email.com" required>
+    <hr>
 
-            <label>Phone Number <span>*</span></label>
-            <input type="tel" name="phone" placeholder="09XXXXXXXXX" pattern="^09\d{9}$" maxlength="11" required>
-            <small style="display: block; color: #64748b; margin-top: 5px;">Format: 09XXXXXXXXX (11 digits)</small>
+    <form method="GET" action="form.php">
 
-            <label>Complete Address <span>*</span></label>
-            <textarea name="address" placeholder="Street, Barangay, City/Municipality, Province" required></textarea>
+        <p>
+            By checking the box below, you confirm that you have read, understood, and agree
+            to the collection and processing of your personal data as described above, in
+            accordance with the <strong>Data Privacy Act of 2012 (RA 10173)</strong>.
+        </p>
 
-            <div class="section-divider"></div>
+        <label>
+            <input type="checkbox" name="consent" value="1" required>
+            I have read and understood the Data Privacy Consent Form. I voluntarily give
+            my consent to SUNN to collect, use, and process my personal data for the
+            purpose of enrollment.
+        </label>
 
-            <h3>Emergency Contact</h3>
+        <br><br>
 
-            <label>Guardian Name <span>*</span></label>
-            <input type="text" name="guardian_name" placeholder="e.g. Juan Santos" required>
+        <p><small>
+            You must agree to the above terms before proceeding with your enrollment application.
+            If you do not agree, please do not proceed.
+        </small></p>
 
-            <label>Guardian Phone Number <span>*</span></label>
-            <input type="tel" name="guardian_phone" placeholder="09XXXXXXXXX" pattern="^09\d{9}$" maxlength="11" required>
+        <button type="submit">I Agree — Proceed to Enrollment Form</button>
+        <a href="../../index.php">I Do Not Agree — Go Back</a>
 
-            <label>Guardian Address <span>*</span></label>
-            <textarea name="guardian_address" placeholder="Street, Barangay, City/Municipality, Province" required></textarea>
-
-            <div class="section-divider"></div>
-
-            <h3>Academic Information</h3>
-
-            <label>Preferred Course <span>*</span></label>
-            <select name="course_id" required>
-                <option value="" disabled selected hidden>— Select Course —</option>
-                <optgroup label="College of Computing">
-                    <option value="1">BS Computer Science</option>
-                    <option value="2">BS Information Technology</option>
-                    <option value="3">BS Information Systems</option>
-                </optgroup>
-                <optgroup label="College of Engineering">
-                    <option value="4">BS Civil Engineering</option>
-                    <option value="5">BS Electrical Engineering</option>
-                    <option value="6">BS Mechanical Engineering</option>
-                </optgroup>
-                <optgroup label="College of Health Sciences">
-                    <option value="7">BS Nursing</option>
-                    <option value="8">BS Pharmacy</option>
-                    <option value="9">BS Physical Therapy</option>
-                </optgroup>
-                <optgroup label="College of Business">
-                    <option value="10">BS Accountancy</option>
-                    <option value="11">BS Business Administration</option>
-                    <option value="12">BS Tourism Management</option>
-                </optgroup>
-                <optgroup label="College of Education">
-                    <option value="13">Bachelor of Elementary Education</option>
-                    <option value="14">Bachelor of Secondary Education</option>
-                </optgroup>
-            </select>
-
-            <label>Year Level <span>*</span></label>
-            <select name="year_level" required>
-                <option value="" disabled selected hidden>— Select Year —</option>
-                <option value="1st Year">1st Year (Freshmen)</option>
-                <option value="2nd Year">2nd Year</option>
-                <option value="3rd Year">3rd Year</option>
-                <option value="4th Year">4th Year</option>
-                <option value="Transferee">Transferee</option>
-                <option value="Shiftee">Shiftee</option>
-            </select>
-
-            <label>Previous School / Last School Attended</label>
-            <input type="text" name="previous_school" placeholder="e.g. Sagay National High School">
-
-            <label>General Weighted Average (GPA)</label>
-            <input type="number" name="gpa" step="0.01" min="1" max="100" placeholder="e.g. 92 or 1.25">
-
-            <p class="disclaimer"><small>By submitting, you confirm that all information provided is accurate and truthful.</small></p>
-            
-            <button type="submit">Submit Application →</button>
-
-        </form>
-    </div>
-</div>
+    </form>
 
 </body>
 </html>
