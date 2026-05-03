@@ -2,35 +2,59 @@
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: login.php");
+    header("Location: otp.php");
     exit;
 }
 
-if (empty($_SESSION['otp_code']) || empty($_SESSION['otp_expires'])) {
-    header("Location: login.php?error=" . urlencode("Session expired. Please start again."));
+$inputOtp = trim($_POST['otp'] ?? '');
+$refNum   = $_SESSION['temp_ref'] ?? '';
+
+if ($refNum === '' || $inputOtp === '') {
+    header("Location: login.php?error=" . urlencode("Session expired. Please login again."));
     exit;
 }
 
-// Check expiry
-if (time() > $_SESSION['otp_expires']) {
-    unset($_SESSION['otp_code'], $_SESSION['otp_expires'], $_SESSION['otp_enrollee_id'], $_SESSION['otp_email']);
-    header("Location: login.php?error=" . urlencode("OTP has expired. Please request a new one."));
+$conn = new mysqli("localhost", "root", "", "sunn_enrollment");
+if ($conn->connect_error) {
+    header("Location: otp.php?error=" . urlencode("Database connection failed."));
     exit;
 }
 
-$submitted_otp = trim($_POST['otp'] ?? '');
+$stmt = $conn->prepare("
+    SELECT id, otp_expiry FROM otp_tokens
+    WHERE reference_no = ?
+      AND otp_code     = ?
+      AND used         = 0
+    LIMIT 1
+");
+$stmt->bind_param("ss", $refNum, $inputOtp);
+$stmt->execute();
+$result = $stmt->get_result();
+$token  = $result->fetch_assoc();
+$stmt->close();
 
-if ($submitted_otp !== $_SESSION['otp_code']) {
-    header("Location: otp.php?error=" . urlencode("Incorrect OTP. Please try again."));
+if (!$token) {
+    header("Location: otp.php?error=" . urlencode("Invalid OTP. Please try again."));
+    $conn->close();
     exit;
 }
 
-// OTP is valid — mark as verified
-$_SESSION['verified_enrollee_id'] = $_SESSION['otp_enrollee_id'];
+if (time() > $token['otp_expiry']) {
+    header("Location: otp.php?error=" . urlencode("OTP has expired. Please request a new one."));
+    $conn->close();
+    exit;
+}
 
-// Clean up OTP session data
-unset($_SESSION['otp_code'], $_SESSION['otp_expires'], $_SESSION['otp_enrollee_id'], $_SESSION['otp_email']);
+// Mark OTP as used
+$stmt = $conn->prepare("UPDATE otp_tokens SET used = 1 WHERE id = ?");
+$stmt->bind_param("i", $token['id']);
+$stmt->execute();
+$stmt->close();
+$conn->close();
 
-header("Location: view.php");
+// Set session and redirect
+unset($_SESSION['temp_ref']);
+$_SESSION['ref_no'] = $refNum;
+header("Location: view_dashboard.php");
 exit;
 ?>

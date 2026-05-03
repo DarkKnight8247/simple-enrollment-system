@@ -148,12 +148,28 @@ if ($conn->query($sql) === TRUE) {
         VALUES ('$admin_username', '$admin_password')
     ");
 
+    // =============================================
+    // 10. OTP TOKENS
+    // =============================================
+    $conn->query("
+    CREATE TABLE IF NOT EXISTS otp_tokens (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        reference_no  VARCHAR(30) NOT NULL,
+        otp_code      VARCHAR(6)  NOT NULL,
+        otp_expiry    INT         NOT NULL,
+        used          TINYINT(1)  NOT NULL DEFAULT 0,
+        FOREIGN KEY (reference_no) REFERENCES education(reference_no)
+            ON DELETE CASCADE
+    ) ENGINE=InnoDB;
+    ");
+    
     echo "Database, tables, seed courses, and admin account created successfully.";
 
-} else {
-    die("ERROR creating database: " . $conn->error);
-}
+    } else {
+        die("ERROR creating database: " . $conn->error);
+    }
 
 // ← close ONCE, at the very end
 $conn->close();
+
 ?>
