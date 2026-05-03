@@ -12,7 +12,7 @@ require __DIR__ . '/../../cryptograph_process.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$refNum = strtoupper(trim($_POST['refNum'] ?? ''));
+$refNum = strtoupper(trim($_POST['reference_no'] ?? ''));
 
 if ($refNum === '') {
     header("Location: login.php?error=" . urlencode("Please enter a valid reference number."));

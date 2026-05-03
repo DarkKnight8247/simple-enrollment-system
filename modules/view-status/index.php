@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Check Your Enrollment Status</h2>
-    <form method="POST" action="check_status_process.php">
+    <form method="POST" action="process_login.php">
         <label>Reference Number <span>*</span></label><br>
         <input type="text" name="reference_no" placeholder="e.g. R9T45E87" required><br><br>
         <button type="submit">Check Status</button>
