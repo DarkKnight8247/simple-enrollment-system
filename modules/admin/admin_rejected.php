@@ -21,6 +21,7 @@
         <div class="reason-badge">Account Locked</div>
         <h1>Access Locked</h1>
         <p>Too many failed login attempts detected. Please wait 15 minutes before trying again.</p>
+        <a class="btn-try" href="index.php">Back to Login</a>
     <?php else: ?>
         <!-- 2. Updated Description for Incorrect Credentials[cite: 6] -->
 
