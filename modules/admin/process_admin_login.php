@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: admin_dashboard.php');
     } else {
         $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
-        if ($_SESSION['login_attempts'] >= 5) {
+        if ($_SESSION['login_attempts'] >= 2) {
             $_SESSION['lockout_until'] = time() + 900; // 15-minute lock
         }
         header('Location: admin_rejected.php?reason=invalid'); // "Reject wrong pass"[cite: 18, 20]
