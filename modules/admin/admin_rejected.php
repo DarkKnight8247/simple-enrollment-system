@@ -34,6 +34,5 @@
 
     <div class="footer-note">SUNN Enrollment System &nbsp;·&nbsp; Admin Portal</div>
 </div>
-
 </body>
 </html>

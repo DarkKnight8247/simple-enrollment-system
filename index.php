@@ -6,7 +6,6 @@
     <title>SUNN Enrollment System</title>
     <!-- Updated path to your stylesheet -->
     <link rel="stylesheet" href="modules/styles/stylesheets/homepage_style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
