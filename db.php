@@ -80,7 +80,6 @@ if ($conn->query($sql) === TRUE) {
         year_level      TEXT,
         previous_school TEXT,
         gpa             TEXT,
-        status          ENUM('Pending', 'Accepted', 'Rejected') DEFAULT 'Pending',
         submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
             ON DELETE CASCADE,

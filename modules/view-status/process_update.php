@@ -2,56 +2,56 @@
 session_start();
 
 if (empty($_SESSION['ref_no'])) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: status.php");
+    header("Location: view_dashboard.php");
     exit;
 }
 
 require __DIR__ . '/../../cryptograph_process.php';
 
-$ref_no          = $_SESSION['ref_no'];
-$first_name      = htmlspecialchars(trim($_POST['first_name']       ?? ''));
-$middle_name     = htmlspecialchars(trim($_POST['middle_name']      ?? ''));
-$last_name       = htmlspecialchars(trim($_POST['last_name']        ?? ''));
-$sex             = htmlspecialchars(trim($_POST['sex']              ?? ''));
-$birthdate       = htmlspecialchars(trim($_POST['birthdate']        ?? ''));
-$civil_status    = htmlspecialchars(trim($_POST['civil_status']     ?? ''));
-$email           = htmlspecialchars(trim($_POST['email']            ?? ''));
-$phone           = htmlspecialchars(trim($_POST['phone']            ?? ''));
-$address         = htmlspecialchars(trim($_POST['address']          ?? ''));
-$guardian_name   = htmlspecialchars(trim($_POST['guardian_name']    ?? ''));
-$guardian_phone  = htmlspecialchars(trim($_POST['guardian_phone']   ?? ''));
-$guardian_address= htmlspecialchars(trim($_POST['guardian_address'] ?? ''));
-$year_level      = htmlspecialchars(trim($_POST['year_level']       ?? ''));
-$previous_school = htmlspecialchars(trim($_POST['previous_school']  ?? ''));
-$gpa             = htmlspecialchars(trim($_POST['gpa']              ?? ''));
-$course_id       = !empty($_POST['course_id']) ? (int)$_POST['course_id'] : null;
+$ref_no           = $_SESSION['ref_no'];
+$first_name       = htmlspecialchars(trim($_POST['first_name']       ?? ''));
+$middle_name      = htmlspecialchars(trim($_POST['middle_name']      ?? ''));
+$last_name        = htmlspecialchars(trim($_POST['last_name']        ?? ''));
+$sex              = htmlspecialchars(trim($_POST['sex']              ?? ''));
+$birthdate        = htmlspecialchars(trim($_POST['birthdate']        ?? ''));
+$civil_status     = htmlspecialchars(trim($_POST['civil_status']     ?? ''));
+$email            = htmlspecialchars(trim($_POST['email']            ?? ''));
+$phone            = htmlspecialchars(trim($_POST['phone']            ?? ''));
+$address          = htmlspecialchars(trim($_POST['address']          ?? ''));
+$guardian_name    = htmlspecialchars(trim($_POST['guardian_name']    ?? ''));
+$guardian_phone   = htmlspecialchars(trim($_POST['guardian_phone']   ?? ''));
+$guardian_address = htmlspecialchars(trim($_POST['guardian_address'] ?? ''));
+$year_level       = htmlspecialchars(trim($_POST['year_level']       ?? ''));
+$previous_school  = htmlspecialchars(trim($_POST['previous_school']  ?? ''));
+$gpa              = htmlspecialchars(trim($_POST['gpa']              ?? ''));
+$course_id        = !empty($_POST['course_id']) ? (int)$_POST['course_id'] : null;
 
 // Validate
 $errors = [];
-if ($first_name      === '') $errors[] = "First name is required.";
-if ($last_name       === '') $errors[] = "Last name is required.";
-if ($sex             === '') $errors[] = "Sex is required.";
-if ($birthdate       === '') $errors[] = "Date of birth is required.";
-if ($civil_status    === '') $errors[] = "Civil status is required.";
-if ($email           === '') $errors[] = "Email is required.";
-if ($phone           === '') $errors[] = "Phone is required.";
-if ($address         === '') $errors[] = "Address is required.";
-if ($guardian_name   === '') $errors[] = "Guardian name is required.";
-if ($guardian_phone  === '') $errors[] = "Guardian phone is required.";
-if ($guardian_address=== '') $errors[] = "Guardian address is required.";
-if ($year_level      === '') $errors[] = "Year level is required.";
-if (!$course_id || $course_id <= 0) $errors[] = "Please select a course.";
-if (!preg_match('/^09\d{9}$/', $phone))         $errors[] = "Invalid phone format.";
+if ($first_name       === '') $errors[] = "First name is required.";
+if ($last_name        === '') $errors[] = "Last name is required.";
+if ($sex              === '') $errors[] = "Sex is required.";
+if ($birthdate        === '') $errors[] = "Date of birth is required.";
+if ($civil_status     === '') $errors[] = "Civil status is required.";
+if ($email            === '') $errors[] = "Email is required.";
+if ($phone            === '') $errors[] = "Phone is required.";
+if ($address          === '') $errors[] = "Address is required.";
+if ($guardian_name    === '') $errors[] = "Guardian name is required.";
+if ($guardian_phone   === '') $errors[] = "Guardian phone is required.";
+if ($guardian_address === '') $errors[] = "Guardian address is required.";
+if ($year_level       === '') $errors[] = "Year level is required.";
+if (!$course_id || $course_id <= 0)          $errors[] = "Please select a course.";
+if (!preg_match('/^09\d{9}$/', $phone))      $errors[] = "Invalid phone format. Use 09XXXXXXXXX.";
 if (!preg_match('/^09\d{9}$/', $guardian_phone)) $errors[] = "Invalid guardian phone format.";
 
 if (!empty($errors)) {
-    foreach ($errors as $e) echo "<p style='color:red;'>$e</p>";
-    echo "<a href='status.php'>Go back</a>";
+    foreach ($errors as $e) echo "<div class='alert alert-error'>⚠ $e</div>";
+    echo "<a href='view_dashboard.php'>← Go back</a>";
     exit;
 }
 
@@ -61,7 +61,7 @@ if ($conn->connect_error) die("Connection failed.");
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
-    // ── Safety check — must still be Pending ──────────────────
+    // Safety check — must still be Pending
     $stmt = $conn->prepare("
         SELECT ed.enrollee_id, ed.status
         FROM education ed
@@ -78,10 +78,10 @@ try {
     }
 
     if ($current_status !== 'Pending') {
-        die("<p style='color:red;'>Your application is $current_status and can no longer be modified.</p>");
+        die("<p style='color:red;'>Your application is {$current_status} and can no longer be modified.</p>");
     }
 
-    // ── Encrypt ───────────────────────────────────────────────
+    // Encrypt
     $enc_first_name       = encryptData($first_name);
     $enc_middle_name      = encryptData($middle_name);
     $enc_last_name        = encryptData($last_name);
@@ -152,14 +152,13 @@ try {
     $stmt->close();
 
     $conn->commit();
-
-    header("Location: status.php?updated=1");
+    header("Location: view_dashboard.php?updated=1");
     exit;
 
 } catch (mysqli_sql_exception $e) {
     $conn->rollback();
     echo "<p style='color:red;'>Update failed: " . $e->getMessage() . "</p>";
-    echo "<a href='status.php'>Go back</a>";
+    echo "<a href='view_dashboard.php'>← Go back</a>";
 }
 
 $conn->close();

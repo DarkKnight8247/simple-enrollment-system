@@ -10,7 +10,7 @@ $inputOtp = trim($_POST['otp'] ?? '');
 $refNum   = $_SESSION['temp_ref'] ?? '';
 
 if ($refNum === '' || $inputOtp === '') {
-    header("Location: login.php?error=" . urlencode("Session expired. Please login again."));
+    header("Location: index.php?error=" . urlencode("Session expired. Please login again."));
     exit;
 }
 
