@@ -21,7 +21,7 @@ body {
     padding: 40px 20px;
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(rgba(48, 45, 45, 0.5), rgba(98, 93, 93, 0.5)), 
-                url('sunn_bg.jpg') no-repeat center center fixed;
+                url('../../modules/styles/graphics/bg.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 

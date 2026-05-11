@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // --- 2. STATS LOGIC ---
 $stats_res = $conn->query("SELECT status, COUNT(*) as cnt FROM enrollee GROUP BY status");
-$stats = ['pending' => 0, 'accepted' => 0, 'rejected' => 0];
+$stats = ['Pending' => 0, 'Accepted' => 0, 'Rejected' => 0];
 if ($stats_res) {
     while ($s = $stats_res->fetch_assoc()) { 
         $stats[$s['status']] = (int)$s['cnt']; 
@@ -401,17 +401,17 @@ $result = $conn->query($query);
         </div>
         <div class="stat-card pending">
             <span class="stat-icon">⏳</span>
-            <div class="stat-value"><?= $stats['pending'] ?></div>
+            <div class="stat-value"><?= $stats['Pending'] ?></div>
             <div class="stat-label">Pending Review</div>
         </div>
         <div class="stat-card accepted">
             <span class="stat-icon">✅</span>
-            <div class="stat-value"><?= $stats['accepted'] ?></div>
+            <div class="stat-value"><?= $stats['Accepted'] ?></div>
             <div class="stat-label">Accepted</div>
         </div>
         <div class="stat-card rejected">
             <span class="stat-icon">❌</span>
-            <div class="stat-value"><?= $stats['rejected'] ?></div>
+            <div class="stat-value"><?= $stats['Rejected'] ?></div>
             <div class="stat-label">Rejected</div>
         </div>
     </div>
