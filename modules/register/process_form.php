@@ -2,6 +2,185 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+/**
+ * Renders a branded SUNN error page and exits.
+ * @param string[] $errors  Array of human-readable error messages.
+ * @param string   $type    'validation' | 'duplicate'
+ */
+function showErrorPage(array $errors, string $type = 'validation'): void
+{
+    $isDuplicate = ($type === 'duplicate');
+    $title    = $isDuplicate ? 'Submission Failed'      : 'Invalid Submission';
+    $subtitle = $isDuplicate
+        ? 'We found existing records that conflict with your information.<br>Please review the details below.'
+        : 'Some required fields are missing or invalid. Please review the errors below.';
+    $iconClass = $isDuplicate ? 'ti-alert-circle' : 'ti-forms';
+
+    /* Map duplicate keys to icon + field label */
+    $fieldMeta = [
+        'Full name already exists.'          => ['ti-user-off',  'Full Name'],
+        'Email already exists.'              => ['ti-mail-off',  'Email Address'],
+        'Phone number already exists.'       => ['ti-phone-off', 'Phone Number'],
+    ];
+
+    $items = '';
+    foreach ($errors as $err) {
+        if ($isDuplicate && isset($fieldMeta[$err])) {
+            [$ico, $field] = $fieldMeta[$err];
+            $items .= "
+            <li>
+              <div class='err-bullet'><i class='ti {$ico}' aria-hidden='true'></i></div>
+              <div class='err-text'>
+                <span class='err-field'>" . htmlspecialchars($field) . "</span>
+                <span class='err-msg'>"  . htmlspecialchars($err)   . "</span>
+              </div>
+            </li>";
+        } else {
+            $items .= "
+            <li>
+              <div class='err-bullet'><i class='ti ti-x' aria-hidden='true'></i></div>
+              <div class='err-text'>
+                <span class='err-msg'>" . htmlspecialchars($err) . "</span>
+              </div>
+            </li>";
+        }
+    }
+
+    $tip = $isDuplicate
+        ? '<p>If you\'ve already submitted an application, use your <strong>reference number</strong> on the <strong>View Status</strong> page to check or update your information.</p>'
+        : '<p>Please go back and fill in all required fields correctly before resubmitting.</p>';
+
+    echo <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Error – SUNN Enrollment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{min-height:100%;font-family:'Poppins',sans-serif;}
+    body{
+      display:flex;justify-content:center;align-items:center;
+      min-height:100vh;padding:40px 20px;
+      background:linear-gradient(rgba(48,45,45,.55),rgba(98,93,93,.55)),
+                 url('../../modules/styles/graphics/bg.jpg') no-repeat center center fixed;
+      background-size:cover;
+    }
+    .card{
+      background:#fff;max-width:640px;width:100%;
+      border-radius:20px;overflow:hidden;
+      border:5px solid #fbbf24;
+    }
+    .card-header{
+      background:linear-gradient(rgba(15,20,40,.92),rgba(20,30,55,.96));
+      padding:24px 24px 18px;text-align:center;
+      border-bottom:3px solid #fbbf24;
+    }
+    .logo-circle{
+      width:68px;height:68px;border-radius:50%;background:#fbbf24;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 10px;
+    }
+    .logo-circle img{width:54px;height:54px;object-fit:contain;}
+    .card-header h1{color:#fff;font-size:.95rem;font-weight:700;letter-spacing:.04em;margin:0 0 4px;}
+    .tagline{color:#fbbf24;font-size:.7rem;text-transform:uppercase;letter-spacing:2px;font-weight:600;}
+    .gold-bar{height:2px;background:#fbbf24;width:48px;margin:14px auto 0;border-radius:2px;}
+    .card-body{padding:36px 40px 40px;}
+
+    .err-icon-wrap{
+      width:72px;height:72px;border-radius:50%;
+      background:#fef2f2;border:2px solid #fecaca;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 18px;font-size:2rem;color:#dc2626;
+    }
+    .err-title{font-size:1.4rem;font-weight:700;color:#b91c1c;text-align:center;margin:0 0 6px;}
+    .err-sub{font-size:.87rem;color:#64748b;text-align:center;margin:0 0 26px;line-height:1.6;}
+
+    .err-list{list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:12px;}
+    .err-list li{
+      display:flex;align-items:flex-start;gap:12px;
+      background:#fff5f5;border:1.5px solid #fecaca;
+      border-radius:12px;padding:14px 16px;
+    }
+    .err-bullet{
+      width:28px;height:28px;border-radius:50%;background:#fee2e2;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      font-size:.9rem;color:#dc2626;
+    }
+    .err-text{display:flex;flex-direction:column;}
+    .err-field{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ef4444;margin-bottom:2px;}
+    .err-msg{font-size:.87rem;color:#1e293b;font-weight:500;}
+
+    .tip{
+      background:#fffbeb;border:1.5px solid #fde68a;
+      border-radius:12px;padding:14px 18px;
+      display:flex;gap:10px;align-items:flex-start;margin-bottom:26px;
+      font-size:.83rem;color:#92400e;line-height:1.6;
+    }
+    .tip-icon{flex-shrink:0;font-size:1.1rem;margin-top:1px;}
+
+    .actions{display:flex;flex-direction:column;gap:10px;}
+    .btn-back{
+      display:block;width:100%;padding:15px;text-align:center;text-decoration:none;
+      background:#3f9142;color:#fff;border:none;border-radius:12px;
+      font-size:.95rem;font-weight:700;cursor:pointer;
+      box-shadow:0 4px 0 #276429;transition:all .2s;
+      text-transform:uppercase;letter-spacing:.05em;font-family:'Poppins',sans-serif;
+    }
+    .btn-back:hover{background:#2d6b30;transform:translateY(-1px);box-shadow:0 5px 0 #1d4821;}
+    .btn-back:active{transform:translateY(3px);box-shadow:none;}
+    .btn-home{
+      display:block;width:100%;padding:12px;text-align:center;text-decoration:none;
+      background:transparent;color:#64748b;border:1.5px solid #e2e8f0;
+      border-radius:12px;font-size:.87rem;transition:all .2s;font-family:'Poppins',sans-serif;
+    }
+    .btn-home:hover{background:#f8fafc;color:#1e293b;border-color:#cbd5e1;}
+
+    @media(max-width:480px){
+      .card-body{padding:28px 20px 32px;}
+      .err-title{font-size:1.2rem;}
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div class="card-header">
+    <div class="logo-circle">
+      <img src="logo.png" alt="SUNN Logo">
+    </div>
+    <h1>STATE UNIVERSITY OF NORTHERN NEGROS</h1>
+    <div class="tagline">The Future Shines Brightest</div>
+    <div class="gold-bar"></div>
+  </div>
+
+  <div class="card-body">
+    <div class="err-icon-wrap" aria-hidden="true">⚠</div>
+    <h2 class="err-title">{$title}</h2>
+    <p class="err-sub">{$subtitle}</p>
+
+    <ul class="err-list">{$items}</ul>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      {$tip}
+    </div>
+
+    <div class="actions">
+      <a href="javascript:history.back()" class="btn-back">← Go Back &amp; Correct</a>
+      <a href="../../index.php" class="btn-home">Return to Home</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
+HTML;
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__ . '/../../cryptograph_process.php';
     require __DIR__ . '/../../vendor/autoload.php';
@@ -54,10 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (!empty($errors)) {
-        foreach ($errors as $error) {
-            echo "<p style='color:red;'>$error</p>";
-        }
-        exit;
+        showErrorPage($errors, 'validation');
     }
 
     // ─── 3. Encrypt ────────────────────────────────────────────
@@ -80,7 +256,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // ─── 4. Connect ────────────────────────────────────────────
     $conn = new mysqli("localhost", "root", "", "sunn_enrollment");
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        showErrorPage(['Could not connect to the database. Please try again later.'], 'validation');
     }
 
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -95,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($course_exists === 0) {
         $conn->close();
-        die("<p style='color:red;'>Selected course does not exist. Please go back and try again.</p>");
+        showErrorPage(['The selected course does not exist. Please go back and choose a valid course.'], 'validation');
     }
 
     // ─── 6. Duplicate checks ───────────────────────────────────
@@ -131,11 +307,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($phone_count > 0) $dup_errors[] = "Phone number already exists.";
 
     if (!empty($dup_errors)) {
-        foreach ($dup_errors as $err) {
-            echo "<p style='color:red;'>$err</p>";
-        }
         $conn->close();
-        exit;
+        showErrorPage($dup_errors, 'duplicate');
     }
 
     // ─── 8. Insert (all-or-nothing transaction) ────────────────
@@ -278,7 +451,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
-        echo "<p style='color:red;'>Something went wrong. Please try again.<br>Details: " . $e->getMessage() . "</p>";
+        showErrorPage(['Something went wrong while saving your application. Please try again.'], 'validation');
     }
 
     $conn->close();
