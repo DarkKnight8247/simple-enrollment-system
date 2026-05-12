@@ -1,135 +1,519 @@
+/* ============================================================
+   SUNN ENROLLMENT SYSTEM — form.css
+   Mobile-first responsive stylesheet
+   Breakpoints:
+     Mobile  : 320px – 480px  (base styles)
+     Tablet  : 481px – 768px  (@media min-width: 481px)
+     Laptop  : 769px – 1024px (@media min-width: 769px)
+     Desktop : 1025px+        (@media min-width: 1025px)
+   ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+/* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-    --sunn-gold: #fbbf24;
-    --sunn-green: #3f9142;
-    --white: #ffffff;
-    --shadow: rgba(74, 63, 63, 0.6);
+    --sunn-gold:        #fbbf24;
+    --sunn-gold-dark:   #d97706;
+    --sunn-gold-light:  #fcd34d;
+    --sunn-green:       #3f9142;
+    --sunn-green-light: rgba(63, 145, 66, 0.1);
+    --white:            #ffffff;
+    --text-dark:        #1e293b;
+    --text-mid:         #334155;
+    --text-muted:       #64748b;
+    --border-color:     #e2e8f0;
+    --error-color:      #ef4444;
+    --shadow:           rgba(74, 63, 63, 0.55);
+
+    /* Spacing scale */
+    --space-xs:  8px;
+    --space-sm:  12px;
+    --space-md:  16px;
+    --space-lg:  24px;
+    --space-xl:  32px;
+    --space-2xl: 48px;
+
+    /* Radius scale */
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
 }
 
-* {
+/* ── Reset ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* Prevent font inflation on Android/iOS */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Smooth scroll */
+    scroll-behavior: smooth;
+}
+
+/* ── Body — Mobile First ───────────────────────────────────── */
 body {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
+    align-items: flex-start;
+    /* Tight mobile padding; grows at larger breakpoints */
+    padding: var(--space-sm) var(--space-xs);
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(rgba(48, 45, 45, 0.5), rgba(98, 93, 93, 0.5)), 
-                url('../../modules/styles/graphics/bg.jpg') no-repeat center center fixed;
-    background-size: cover;
+    font-size: 16px; /* base prevents iOS zoom */
+    line-height: 1.5;
+    color: var(--text-dark);
+    background:
+        linear-gradient(rgba(48, 45, 45, 0.52), rgba(98, 93, 93, 0.52)),
+        url('../../modules/styles/graphics/bg.jpg') no-repeat center center / cover fixed;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
 }
 
+/* ── Main container ────────────────────────────────────────── */
 .container {
     background: var(--white);
-    max-width: 700px;
+    /* Full width on mobile, capped on larger screens */
     width: 100%;
-    border-radius: 25px;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 50px 100px var(--shadow);
-    border: 6px solid var(--sunn-gold); /* The gold frame from your preview */
+    box-shadow: 0 16px 48px var(--shadow);
+    border: 3px solid var(--sunn-gold);
 }
 
+/* ── Header ────────────────────────────────────────────────── */
 .header {
-    background: linear-gradient(rgba(54, 49, 49, 0.8), rgba(112, 104, 104, 0.95)), 
-                url('sunn_bg.jpg') no-repeat center 30%;
-    background-size: cover;
-    padding: 5px 2px;
+    background:
+        linear-gradient(rgba(54, 49, 49, 0.82), rgba(112, 104, 104, 0.95)),
+        url('sunn_bg.jpg') no-repeat center 30% / cover;
+    padding: var(--space-md) var(--space-sm);
     text-align: center;
-    color: white;
-    border-bottom: 4px solid var(--sunn-gold);
+    color: var(--white);
+    border-bottom: 3px solid var(--sunn-gold);
 }
 
 .logo {
-    max-width: 150px;
+    display: block;
+    width: clamp(60px, 18vw, 110px);
     height: auto;
-    margin-bottom: 2px;
+    margin: 0 auto var(--space-xs);
+    /* Preserve aspect ratio, never overflow */
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.header h1 {
+    font-size: clamp(0.72rem, 3.2vw, 1.1rem);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    /* Allow wrapping on tiny screens */
+    word-break: break-word;
 }
 
 .tagline {
     color: var(--sunn-gold);
-    font-size: 0.9rem;
+    font-size: clamp(0.6rem, 2.4vw, 0.82rem);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: clamp(1px, 0.4vw, 2px);
+    margin-top: 4px;
 }
 
 .divider {
     height: 3px;
     background: var(--sunn-gold);
-    width: 70px;
-    margin: 20px auto;
+    width: 60px;
+    margin: var(--space-sm) auto;
+    border-radius: 2px;
 }
 
+.header h2 {
+    font-size: clamp(0.78rem, 3.2vw, 1.05rem);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* ── Content area ──────────────────────────────────────────── */
 .content {
-    padding: .01px 60px 50px 60px; 
+    /* Tight side padding on mobile */
+    padding: var(--space-xs) var(--space-md) var(--space-xl);
 }
 
+/* ── Section headings ──────────────────────────────────────── */
 h3 {
     color: var(--sunn-green);
-    margin: 50px 0 5px 0;
-    border-left: 5px solid var(--sunn-gold);
-    padding-left: 10px;
-    font-size: 1.2rem;
+    margin: var(--space-xl) 0 var(--space-xs) 0;
+    border-left: 4px solid var(--sunn-gold);
+    padding-left: var(--space-sm);
+    font-size: clamp(0.75rem, 2.8vw, 1rem);
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.3;
 }
 
+/* ── Field labels ──────────────────────────────────────────── */
 label {
     display: block;
     font-weight: 600;
-    font-size: 0.85rem;
-    color: #334155;
-    margin-top: 25px;
+    font-size: clamp(0.7rem, 2.4vw, 0.82rem);
+    color: var(--text-mid);
+    margin-top: var(--space-md);
     text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
-label span { color: #ef4444; }
+label span {
+    color: var(--error-color);
+    margin-left: 2px;
+}
 
-input, select, textarea {
+/* ── Form inputs / selects / textareas ─────────────────────── */
+input,
+select,
+textarea {
+    display: block;
     width: 100%;
-    padding: 16px;
-    margin-top: 10px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
+    padding: 13px var(--space-sm);
+    margin-top: 6px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    /* 16px minimum prevents iOS auto-zoom */
+    font-size: 16px;
     font-family: inherit;
-    transition: all 0.3s ease;
+    color: var(--text-dark);
+    background-color: var(--white);
+    /* Remove native styling */
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    /* Full touch-target width */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-input:focus, select:focus, textarea:focus {
+/* Custom chevron for <select> */
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 38px;
+    cursor: pointer;
+}
+
+textarea {
+    min-height: 85px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--sunn-green);
-    box-shadow: 0 0 0 4px rgba(63, 145, 66, 0.1);
+    box-shadow: 0 0 0 3px var(--sunn-green-light);
 }
 
-button {
+/* Inline name row: 2 columns on tablet+ (stacked on mobile) */
+.name-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+}
+
+/* ── Helper text ───────────────────────────────────────────── */
+small {
+    display: block;
+    color: var(--text-muted);
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+/* ── Disclaimer ────────────────────────────────────────────── */
+.disclaimer {
+    margin-top: var(--space-md);
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* ── Submit button ─────────────────────────────────────────── */
+button[type="submit"] {
+    display: block;
     width: 100%;
-    margin-top: 40px;
-    padding: 20px;
+    margin-top: var(--space-lg);
+    /* Generous touch target (min 48px) */
+    min-height: 52px;
+    padding: 14px var(--space-md);
     background: var(--sunn-gold);
     color: #000;
     border: none;
-    border-radius: 15px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    border-radius: var(--radius-lg);
+    font-size: clamp(0.9rem, 3.2vw, 1.1rem);
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    box-shadow: 0 6px 0px #d97706;
-    transition: all 0.2s;
+    box-shadow: 0 5px 0 var(--sunn-gold-dark);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-button:hover {
-    background: #fcd34d;
+button[type="submit"]:hover {
+    background: var(--sunn-gold-light);
     transform: translateY(-2px);
-    box-shadow: 0 8px 0px #d97706;
+    box-shadow: 0 7px 0 var(--sunn-gold-dark);
 }
 
-button:active {
-    transform: translateY(4px);
+button[type="submit"]:active {
+    transform: translateY(3px);
     box-shadow: none;
+}
+
+/* ── Dashboard return button ───────────────────────────────── */
+.btn-dashboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    min-height: 48px;
+    padding: 12px var(--space-md);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: clamp(0.82rem, 2.6vw, 0.9rem);
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-dashboard:hover {
+    border-color: var(--sunn-green);
+    color: var(--sunn-green);
+    background: var(--sunn-green-light);
+}
+
+.btn-dashboard:active {
+    background: rgba(63, 145, 66, 0.2);
+}
+
+/* Section visual divider */
+.section-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin-top: var(--space-xl);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BREAKPOINT 1 — Tablet: 481px – 768px
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 481px) {
+    body {
+        padding: var(--space-lg) var(--space-md);
+        align-items: flex-start;
+    }
+
+    .container {
+        border-radius: var(--radius-xl);
+        border-width: 4px;
+        box-shadow: 0 28px 70px var(--shadow);
+    }
+
+    .header {
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .content {
+        padding: var(--space-sm) var(--space-xl) var(--space-2xl);
+    }
+
+    h3 {
+        margin-top: var(--space-2xl);
+    }
+
+    label {
+        margin-top: var(--space-lg);
+    }
+
+    input,
+    select,
+    textarea {
+        padding: 14px var(--space-md);
+        border-radius: var(--radius-md);
+    }
+
+    /* 2-column name row on tablet */
+    .name-row {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+    }
+
+    /* 2-column grid for short paired fields */
+    .field-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+        align-items: start;
+    }
+
+    button[type="submit"] {
+        font-size: 1rem;
+        padding: 16px var(--space-lg);
+        min-height: 54px;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BREAKPOINT 2 — Small Laptop: 769px – 1024px
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+    body {
+        padding: var(--space-2xl) var(--space-xl);
+        align-items: center;
+    }
+
+    .container {
+        max-width: 720px;
+        border-radius: 24px;
+        border-width: 5px;
+        box-shadow: 0 40px 90px var(--shadow);
+    }
+
+    .header {
+        padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    }
+
+    .content {
+        padding: var(--space-sm) 48px var(--space-2xl);
+    }
+
+    input,
+    select,
+    textarea {
+        padding: 15px var(--space-md);
+    }
+
+    button[type="submit"] {
+        font-size: 1.05rem;
+        margin-top: var(--space-xl);
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BREAKPOINT 3 — Desktop: 1025px+
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 1025px) {
+    body {
+        padding: 56px var(--space-xl);
+    }
+
+    .container {
+        max-width: 760px;
+        border-radius: 28px;
+        border-width: 6px;
+        box-shadow: 0 56px 110px var(--shadow);
+    }
+
+    .header {
+        padding: 28px var(--space-2xl) var(--space-xl);
+    }
+
+    .content {
+        padding: var(--space-sm) 60px 52px;
+    }
+
+    .logo {
+        width: 120px;
+        margin-bottom: var(--space-sm);
+    }
+
+    h3 {
+        font-size: 1.05rem;
+        margin-top: 44px;
+    }
+
+    label {
+        font-size: 0.83rem;
+        margin-top: 22px;
+    }
+
+    input,
+    select,
+    textarea {
+        padding: 16px var(--space-md);
+        font-size: 16px;
+    }
+
+    textarea {
+        min-height: 96px;
+    }
+
+    button[type="submit"] {
+        font-size: 1.15rem;
+        padding: 20px var(--space-xl);
+        margin-top: 36px;
+        border-radius: 18px;
+        min-height: 60px;
+        box-shadow: 0 6px 0 var(--sunn-gold-dark);
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILITY — Landscape phones (short viewport)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: var(--space-sm) var(--space-md);
+        align-items: flex-start;
+    }
+
+    .header {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .logo {
+        width: 52px;
+        margin-bottom: 4px;
+    }
+
+    .divider {
+        margin: 6px auto;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILITY — Very small phones (320px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 359px) {
+    .content {
+        padding: var(--space-xs) var(--space-sm) var(--space-xl);
+    }
+
+    .header {
+        padding: var(--space-sm) var(--space-xs);
+    }
+
+    button[type="submit"] {
+        font-size: 0.88rem;
+    }
 }
