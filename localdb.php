@@ -1,28 +1,17 @@
 <?php
-/**
- * DB.PHP - Cloud Ready Version for Render
- */
+$servername = "localhost";
+$username   = "root";
+$password   = "";
 
-// 1. Get credentials from Render Environment Variables
-// If they aren't set (like on your local PC), it defaults to your XAMPP settings
-$servername = getenv('DB_HOST') ?: "localhost";
-$username   = getenv('DB_USER') ?: "root";
-$password   = getenv('DB_PASS') ?: "";
-$database   = getenv('DB_NAME') ?: "sunn_enrollment";
-$port       = getenv('DB_PORT') ?: "3306";
-
-// 2. Initial connection (without DB name to ensure we can create it if allowed)
-$conn = new mysqli($servername, $username, $password, null, $port);
-
+$conn = new mysqli($servername, $username, $password);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// 3. Create Database
-$sql = "CREATE DATABASE IF NOT EXISTS `$database`";
+$sql = "CREATE DATABASE IF NOT EXISTS sunn_enrollment";
 if ($conn->query($sql) === TRUE) {
 
-    $conn->select_db($database);
+    $conn->select_db("sunn_enrollment");
 
     // =============================================
     // 1. ENROLLEE
@@ -35,9 +24,7 @@ if ($conn->query($sql) === TRUE) {
         middle_name  TEXT,
         sex          TEXT NOT NULL,
         birthdate    TEXT NOT NULL,
-        civil_status TEXT,
-        notified     TINYINT(1) NOT NULL DEFAULT 0,
-        status       ENUM('Pending','Accepted','Rejected') NOT NULL DEFAULT 'Pending'
+        civil_status TEXT
     ) ENGINE=InnoDB;
     ");
 
@@ -48,7 +35,7 @@ if ($conn->query($sql) === TRUE) {
     CREATE TABLE IF NOT EXISTS contacts (
         contact_id   INT AUTO_INCREMENT PRIMARY KEY,
         enrollee_id  INT,
-        email        VARCHAR(255) NOT NULL UNIQUE,
+        email        VARCHAR(500) NOT NULL UNIQUE,
         phone_number TEXT NOT NULL,
         address      TEXT NOT NULL,
         FOREIGN KEY (enrollee_id) REFERENCES enrollee(enrollee_id)
@@ -106,15 +93,28 @@ if ($conn->query($sql) === TRUE) {
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS admins (
-        id             INT AUTO_INCREMENT PRIMARY KEY,
-        username       VARCHAR(255) NOT NULL UNIQUE,
-        password_hash  VARCHAR(255) NOT NULL,
-        created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        username      VARCHAR(50)  NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
     ");
 
     // =============================================
-    // 7. SEED COURSES
+    // 7. ALTER ENROLLEE
+    // =============================================
+    $conn->query("
+        ALTER TABLE enrollee
+        ADD COLUMN IF NOT EXISTS notified TINYINT(1) NOT NULL DEFAULT 0
+    ");
+
+    $conn->query("
+        ALTER TABLE enrollee
+        ADD COLUMN IF NOT EXISTS status ENUM('Pending','Accepted','Rejected') NOT NULL DEFAULT 'Pending'
+    ");
+
+    // =============================================
+    // 8. SEED COURSES
     // =============================================
     $conn->query("
     INSERT IGNORE INTO course (course_id, course_name) VALUES
@@ -135,44 +135,39 @@ if ($conn->query($sql) === TRUE) {
     ");
 
     // =============================================
-    // 8. SEED ADMIN ACCOUNT
+    // 9. SEED ADMIN ACCOUNT
     // =============================================
-    // Use an absolute path to ensure Docker finds it
-    $crypto_path = __DIR__ . '/cryptograph_process.php';
-    if (file_exists($crypto_path)) {
-        require_once $crypto_path;
-        
-        $admin_username = encryptData('admin');
-        $admin_password = password_hash('admin123', PASSWORD_BCRYPT);
+    require __DIR__ . '/cryptograph_process.php';
 
-        $conn->query("
-            INSERT IGNORE INTO admins (username, password_hash)
-            VALUES ('$admin_username', '$admin_password')
-        ");
-    }
+    $admin_username = encryptData('admin');
+    $admin_password = password_hash('admin123', PASSWORD_BCRYPT);
+
+    $conn->query("
+        INSERT IGNORE INTO admins (username, password_hash)
+        VALUES ('$admin_username', '$admin_password')
+    ");
 
     // =============================================
-    // 9. OTP TOKENS
+    // 10. OTP TOKENS
     // =============================================
     $conn->query("
     CREATE TABLE IF NOT EXISTS otp_tokens (
-        id             INT AUTO_INCREMENT PRIMARY KEY,
-        reference_no   VARCHAR(30) NOT NULL,
-        otp_code       VARCHAR(6)  NOT NULL,
-        otp_expiry     INT         NOT NULL,
-        used           TINYINT(1)  NOT NULL DEFAULT 0,
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        reference_no  VARCHAR(30) NOT NULL,
+        otp_code      VARCHAR(6)  NOT NULL,
+        otp_expiry    INT         NOT NULL,
+        used          TINYINT(1)  NOT NULL DEFAULT 0,
         FOREIGN KEY (reference_no) REFERENCES education(reference_no)
             ON DELETE CASCADE
     ) ENGINE=InnoDB;
     ");
     
-    // Optional: Log success (comment out for production)
-    // echo "Database check completed.";
+    // echo "Database, tables, seed courses, and admin account created successfully.";
 
-} else {
-    die("ERROR creating/accessing database: " . $conn->error);
-}
+    } else {
+        die("ERROR creating database: " . $conn->error);
+    }
 
-// Do not close the connection here if you are 'including' this in other files
-// $conn->close();
+// ← close ONCE, at the very end
+$conn->close();
 ?>
