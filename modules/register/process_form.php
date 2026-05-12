@@ -182,6 +182,7 @@ HTML;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_once __DIR__ . '/../../db.php';
     require __DIR__ . '/../../cryptograph_process.php';
     require __DIR__ . '/../../vendor/autoload.php';
 
@@ -254,7 +255,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $enc_gpa              = encryptData($gpa);
 
     // ─── 4. Connect ────────────────────────────────────────────
-    $conn = new mysqli("localhost", "root", "", "sunn_enrollment");
     if ($conn->connect_error) {
         showErrorPage(['Could not connect to the database. Please try again later.'], 'validation');
     }
