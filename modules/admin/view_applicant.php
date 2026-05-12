@@ -6,10 +6,11 @@ $conn = new mysqli('localhost', 'root', '', 'sunn_enrollment');
 
 $id = (int)($_GET['id'] ?? 0);
 
-$query = "SELECT e.*, ed.*, c.course_name 
+$query = "SELECT e.*, ed.*, c.course_name, ct.email
           FROM enrollee e 
           JOIN education ed ON e.enrollee_id = ed.enrollee_id 
           JOIN course c ON ed.course_id = c.course_id
+          LEFT JOIN contacts ct ON e.enrollee_id = ct.enrollee_id
           WHERE e.enrollee_id = ?";
 
 $stmt = $conn->prepare($query);
@@ -22,6 +23,7 @@ $previous_school = decryptData($data['previous_school']);
 $gpa             = decryptData($data['gpa']);
 $fname           = decryptData($data['first_name']);
 $lname           = decryptData($data['last_name']);
+$email           = !empty($data['email']) ? decryptData($data['email']) : 'N/A';
 $current_status  = $data['status'] ?? 'pending';
 $initials        = strtoupper(substr($fname, 0, 1) . substr($lname, 0, 1));
 ?>
@@ -358,6 +360,11 @@ $initials        = strtoupper(substr($fname, 0, 1) . substr($lname, 0, 1));
         <div class="data-row">
             <div class="data-label"><span class="data-label-icon">🏫</span> Previous School</div>
             <div class="data-value"><?= htmlspecialchars($previous_school) ?></div>
+        </div>
+
+        <div class="data-row">
+            <div class="data-label"><span class="data-label-icon">✉️</span> Email Address</div>
+            <div class="data-value"><a href="mailto:<?= htmlspecialchars($email) ?>" style="color: var(--blue); text-decoration: none; font-weight: 500;"><?= htmlspecialchars($email) ?></a></div>
         </div>
 
         <div class="data-row">
