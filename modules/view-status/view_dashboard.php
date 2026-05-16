@@ -21,7 +21,7 @@ $stmt = $conn->prepare("
         c.email, c.phone_number, c.address,
         ec.guardian_name, ec.phone_number AS guardian_phone,
         ec.address AS guardian_address,
-        ed.reference_no, e.status, ed.submitted_at,
+        ed.reference_no, e.status AS status, ed.submitted_at,
         ed.year_level, ed.previous_school, ed.gpa, ed.course_id,
         co.course_name
     FROM education ed
@@ -61,7 +61,7 @@ $previous_school  = decryptData($row['previous_school']);
 $gpa              = decryptData($row['gpa']);
 
 $status     = $row['status'];
-$is_pending = $status === 'pending';
+$is_pending = strtolower($status) === 'pending';
 
 $status_class = match($status) {
     'accepted' => 'status-accepted',

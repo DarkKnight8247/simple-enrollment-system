@@ -182,6 +182,7 @@ HTML;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_once __DIR__ . '/../../db.php';
     require __DIR__ . '/../../cryptograph_process.php';
     require __DIR__ . '/../../vendor/autoload.php';
 
@@ -254,7 +255,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $enc_gpa              = encryptData($gpa);
 
     // ─── 4. Connect ────────────────────────────────────────────
-    $conn = new mysqli("localhost", "root", "", "sunn_enrollment");
     if ($conn->connect_error) {
         showErrorPage(['Could not connect to the database. Please try again later.'], 'validation');
     }
@@ -440,181 +440,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             error_log("Enrollment email failed for {$email}: " . $e->getMessage());
         }
 
-        // ─── 10. Success page ─────────────────────────────────
-        echo <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="theme-color" content="#fbbf24">
-  <title>Application Submitted – SUNN Enrollment</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-    body{
-      min-height:100vh;display:flex;justify-content:center;align-items:center;
-      padding:24px 16px;font-family:'Poppins',sans-serif;
-      background:linear-gradient(rgba(48,45,45,.52),rgba(98,93,93,.52)),
-                 url('../../modules/styles/graphics/bg.jpg') no-repeat center center fixed;
-      background-size:cover;
-    }
-
-    /* ── Card ── */
-    .card{
-      background:#fff;width:100%;max-width:600px;
-      border-radius:20px;overflow:hidden;
-      border:5px solid #fbbf24;
-      box-shadow:0 28px 70px rgba(74,63,63,.55);
-    }
-
-    /* ── Header ── */
-    .card-header{
-      background:linear-gradient(rgba(54,49,49,.82),rgba(112,104,104,.95)),
-                 url('sunn_bg.jpg') no-repeat center 30% / cover;
-      padding:22px 20px 18px;text-align:center;
-      border-bottom:3px solid #fbbf24;
-    }
-    .logo{
-      display:block;width:clamp(60px,18vw,90px);height:auto;
-      margin:0 auto 10px;object-fit:contain;
-    }
-    .card-header h1{
-      color:#fff;font-size:clamp(.72rem,3.2vw,1rem);
-      font-weight:700;letter-spacing:.04em;margin:0 0 4px;
-      word-break:break-word;
-    }
-    .tagline{color:#fbbf24;font-size:clamp(.6rem,2.4vw,.75rem);text-transform:uppercase;letter-spacing:2px;font-weight:600;}
-    .gold-bar{height:3px;background:#fbbf24;width:60px;margin:12px auto 0;border-radius:2px;}
-
-    /* ── Body ── */
-    .card-body{padding:36px 32px 40px;text-align:center;}
-
-    /* Success icon */
-    .success-icon{
-      width:76px;height:76px;border-radius:50%;
-      background:#f0fdf4;border:2px solid #86efac;
-      display:flex;align-items:center;justify-content:center;
-      margin:0 auto 20px;font-size:2.2rem;
-    }
-    .success-title{
-      font-size:clamp(1.2rem,4vw,1.5rem);font-weight:700;
-      color:#15803d;margin:0 0 8px;
-    }
-    .success-sub{
-      font-size:clamp(.8rem,2.6vw,.9rem);color:#64748b;
-      margin:0 0 28px;line-height:1.7;
-    }
-
-    /* Reference number box */
-    .ref-box{
-      background:#fffbeb;border:2px solid #fbbf24;
-      border-radius:14px;padding:20px 24px;margin:0 0 24px;
-    }
-    .ref-label{
-      font-size:.68rem;font-weight:700;text-transform:uppercase;
-      letter-spacing:.12em;color:#92400e;margin:0 0 8px;
-    }
-    .ref-number{
-      font-size:clamp(1.6rem,6vw,2.2rem);font-weight:700;
-      color:#1e293b;letter-spacing:.28em;font-family:monospace;
-      word-break:break-all;
-    }
-
-    /* Info tip */
-    .tip{
-      background:#f0fdf4;border:1.5px solid #86efac;
-      border-radius:12px;padding:14px 18px;
-      display:flex;gap:10px;align-items:flex-start;
-      margin:0 0 28px;text-align:left;
-      font-size:clamp(.75rem,2.4vw,.83rem);color:#166534;line-height:1.6;
-    }
-    .tip-icon{flex-shrink:0;font-size:1.1rem;margin-top:1px;}
-
-    /* Email note */
-    .email-note{
-      font-size:clamp(.72rem,2.2vw,.8rem);color:#94a3b8;
-      margin:0 0 28px;line-height:1.6;
-    }
-    .email-note strong{color:#64748b;}
-
-    /* Actions */
-    .actions{display:flex;flex-direction:column;gap:10px;}
-    .btn-home{
-      display:block;width:100%;padding:15px;text-align:center;
-      text-decoration:none;background:#3f9142;color:#fff;
-      border:none;border-radius:12px;font-size:clamp(.88rem,2.8vw,.95rem);
-      font-weight:700;cursor:pointer;box-shadow:0 4px 0 #276429;
-      transition:all .2s;text-transform:uppercase;letter-spacing:.05em;
-      font-family:'Poppins',sans-serif;
-    }
-    .btn-home:hover{background:#2d6b30;transform:translateY(-1px);box-shadow:0 5px 0 #1d4821;}
-    .btn-home:active{transform:translateY(3px);box-shadow:none;}
-    .btn-status{
-      display:block;width:100%;padding:13px;text-align:center;
-      text-decoration:none;background:transparent;color:#64748b;
-      border:2px solid #e2e8f0;border-radius:12px;
-      font-size:clamp(.8rem,2.4vw,.87rem);font-weight:600;
-      transition:all .2s;font-family:'Poppins',sans-serif;
-    }
-    .btn-status:hover{background:#f8fafc;color:#1e293b;border-color:#cbd5e1;}
-
-    @media(min-width:481px){
-      .card-body{padding:40px 48px 44px;}
-    }
-    @media(max-width:359px){
-      .card-body{padding:28px 18px 32px;}
-    }
-  </style>
-</head>
-<body>
-<div class="card">
-
-  <div class="card-header">
-    <img src="logo.png" alt="SUNN Logo" class="logo">
-    <h1>STATE UNIVERSITY OF NORTHERN NEGROS</h1>
-    <div class="tagline">The Future Shines Brightest</div>
-    <div class="gold-bar"></div>
-  </div>
-
-  <div class="card-body">
-    <div class="success-icon" aria-hidden="true">✅</div>
-    <h2 class="success-title">Application Submitted!</h2>
-    <p class="success-sub">
-      Your enrollment application has been received.<br>
-      Please save your reference number below.
-    </p>
-
-    <div class="ref-box">
-      <p class="ref-label">Your Reference Number</p>
-      <div class="ref-number">{$reference_no}</div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-icon">💡</span>
-      <span>
-        While your application status is still <strong>Pending</strong>, you may
-        edit your details anytime on the <strong>View Status</strong> page using
-        your reference number.
-      </span>
-    </div>
-
-    <p class="email-note">
-      A confirmation email with your reference number has been sent to<br>
-      <strong>{$email}</strong>
-    </p>
-
-    <div class="actions">
-      <a href="../../index.php" class="btn-home">Go to Home →</a>
-      <a href="../../index.php" class="btn-status">View Application Status</a>
-    </div>
-  </div>
-
-</div>
-</body>
-</html>
-HTML;
+        // ─── 10. Success message ───────────────────────────────
+        echo "
+            <p>Enrollment submitted successfully!</p>
+            <p>Your reference number is: <strong>{$reference_no}</strong></p>
+            <p>A confirmation email has been sent to your registered email address.</p>
+            <br>
+            <a href='../../index.php'>Go back to Home</a>
+        ";
 
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
